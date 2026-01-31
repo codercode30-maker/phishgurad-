@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+    <title>PhishGuard - Master Scam Detection</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-purple: #a855f7;
+            --secondary-purple: #7c3aed;
+            --dark-purple: #581c87;
+            --primary-pink: #ec4899;
+            --secondary-pink: #f472b6;
+            --dark-bg: #0f0a1f;
+            --darker-bg: #050208;
+            --card-bg: #1a1332;
+            --card-hover: #251a47;
+            --text-white: #f8fafc;
+            --text-gray: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #312549;
+            --success: #10b981;
+            --warning: #fbbf24;
+            --danger: #ef4444;
+            --glow-purple: rgba(168, 85, 247, 0.3);
+            --glow-pink: rgba(236, 72, 153, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, var(--glow-purple) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, var(--glow-pink) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, var(--glow-purple) 0%, transparent 50%);
+            opacity: 0.15;
+            z-index: -1;
+            animation: pulseGlow 15s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.15; }
+            50% { opacity: 0.25; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        header {
+            background: rgba(15, 10, 31, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            background: rgba(15, 10, 31, 0.95);
+            box-shadow: 0 8px 32px rgba(168, 85, 247, 0.1);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 0 20px var(--glow-purple);
+        }
+
+        .logo h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        nav {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-purple), var(--primary-pink));
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--text-white);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--glow-purple) 0%, transparent 70%);
+            opacity: 0.2;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid var(--primary-purple);
+            border-radius: 50px;
+            color: var(--primary-purple);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero h2 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-white), var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.35rem;
+            color: var(--text-gray);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            margin: 3rem 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            color: white;
+            padding: 1.25rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Section Styling */
+        section {
+            padding: 5rem 0;
+        }
+
+        section h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-white), var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Training Section */
+        .training-section {
+            background: var(--darker-bg);
+        }
+
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .difficulty-btn {
+            padding: 1rem 2.5rem;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-gray);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .difficulty-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .difficulty-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .difficulty-btn:hover {
+            border-color: var(--primary-purple);
+            transform: translateY(-2px);
+        }
+
+        .difficulty-btn.active {
+            border-color: var(--primary-pink);
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            color: white;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+
+        .scam-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            min-height: 450px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .scam-email {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .email-header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .email-field {
+            margin-bottom: 0.75rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .email-field strong {
+            color: var(--primary-purple);
+            min-width: 90px;
+            font-weight: 700;
+        }
+
+        .email-field span {
+            color: var(--text-gray);
+        }
+
+        .email-body {
+            line-height: 1.9;
+            color: var(--text-gray);
+            font-size: 1.05rem;
+        }
+
+        .clickable-text {
+            cursor: pointer;
+            padding: 3px 6px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            display: inline-block;
+            position: relative;
+        }
+
+        .clickable-text:hover {
+            background: rgba(168, 85, 247, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .clickable-text.selected {
+            background: linear-gradient(135deg, var(--primary-pink), #dc2626);
+            color: white;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+        }
+
+        .clickable-text.correct {
+            background: var(--success);
+            color: white;
+            animation: successPulse 0.6s ease;
+        }
+
+        .clickable-text.missed {
+            background: var(--warning);
+            color: var(--dark-bg);
+            animation: missedShake 0.5s ease;
+        }
+
+        @keyframes successPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes missedShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .submit-button {
+            margin-top: 2rem;
+            padding: 1rem 3rem;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+            width: 100%;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Feedback Container */
+        .feedback-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-top: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback-container.hidden {
+            display: none;
+        }
+
+        .feedback-container h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .feedback-score {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin: 2rem 0;
+            animation: scoreAppear 0.8s ease;
+        }
+
+        @keyframes scoreAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .feedback-details {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .feedback-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .feedback-item:last-child {
+            border-bottom: none;
+        }
+
+        .feedback-item h4 {
+            color: var(--danger);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .feedback-item p {
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-actions {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            color: white;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-purple);
+            border: 2px solid var(--primary-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-purple);
+            color: white;
+        }
+
+        /* Scanner Section */
+        .scanner-section {
+            background: var(--dark-bg);
+        }
+
+        .scanner-box {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        #scanInput {
+            width: 100%;
+            min-height: 220px;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            color: var(--text-white);
+            font-size: 1.05rem;
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        #scanInput:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        }
+
+        #scanInput::placeholder {
+            color: var(--text-muted);
+        }
+
+        .scan-results {
+            max-width: 900px;
+            margin: 3rem auto;
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.5s ease;
+        }
+
+        .scan-results.hidden {
+            display: none;
+        }
+
+        .risk-meter {
+            margin: 2rem 0;
+        }
+
+        .risk-label {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: var(--text-gray);
+        }
+
+        .risk-bar {
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .risk-fill {
+            height: 100%;
+            transition: width 1s ease, background 0.5s ease;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-weight: 700;
+        }
+
+        .risk-fill.low {
+            background: linear-gradient(90deg, var(--success), #059669);
+        }
+
+        .risk-fill.medium {
+            background: linear-gradient(90deg, var(--warning), #f59e0b);
+        }
+
+        .risk-fill.high {
+            background: linear-gradient(90deg, var(--danger), #dc2626);
+        }
+
+        .risk-text {
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .red-flags-list {
+            margin: 2rem 0;
+        }
+
+        .flag-item {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(239, 68, 68, 0.05);
+            border-left: 4px solid var(--danger);
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .flag-item:hover {
+            background: rgba(239, 68, 68, 0.1);
+            transform: translateX(5px);
+        }
+
+        .flag-icon {
+            font-size: 2rem;
+        }
+
+        .flag-content h4 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .flag-content p {
+            color: var(--text-gray);
+        }
+
+        .scan-tips {
+            background: rgba(168, 85, 247, 0.1);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-top: 2rem;
+            border: 1px solid var(--primary-purple);
+        }
+
+        .scan-tips h4 {
+            color: var(--primary-purple);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .scan-tips ul {
+            list-style: none;
+        }
+
+        .scan-tips li {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-gray);
+        }
+
+        .scan-tips li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-purple);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: var(--darker-bg);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.3);
+            border-color: var(--primary-purple);
+        }
+
+        .stat-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .stat-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .stat-card h3 {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .achievement-section {
+            margin-top: 4rem;
+        }
+
+        .achievement-section h3 {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--text-white), var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 2rem;
+        }
+
+        .achievement {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .achievement.unlocked {
+            border-color: var(--primary-purple);
+            box-shadow: 0 10px 40px rgba(168, 85, 247, 0.3);
+            animation: unlockAnimation 0.6s ease;
+        }
+
+        .achievement.unlocked::before {
+            opacity: 0.1;
+        }
+
+        @keyframes unlockAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .achievement:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .achievement-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            filter: grayscale(100%) brightness(0.5);
+            transition: filter 0.3s ease;
+            position: relative;
+        }
+
+        .achievement.unlocked .achievement-icon {
+            filter: grayscale(0%) brightness(1);
+        }
+
+        .achievement-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-gray);
+            position: relative;
+        }
+
+        .achievement.unlocked .achievement-name {
+            color: var(--text-white);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .toast {
+            background: var(--card-bg);
+            border: 2px solid var(--primary-purple);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            min-width: 350px;
+            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            animation: toastSlideIn 0.5s ease, toastFadeOut 0.5s ease 4.5s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toast::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            opacity: 0.1;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toastFadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+        }
+
+        .toast-icon {
+            font-size: 2.5rem;
+            position: relative;
+        }
+
+        .toast-content h4 {
+            color: var(--text-white);
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            position: relative;
+        }
+
+        .toast-content p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            margin-left: auto;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .toast-close:hover {
+            color: var(--text-white);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--darker-bg);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        footer p {
+            margin-bottom: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .disclaimer {
+            color: var(--warning);
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .difficulty-selector {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feedback-actions {
+                flex-direction: column;
+            }
+
+            nav {
+                gap: 1.5rem;
+            }
+
+            .toast {
+                min-width: 300px;
+            }
+
+            .toast-container {
+                right: 1rem;
+                left: 1rem;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">🛡️</div>
+                <h1>PhishGuard Live</h1>
+            </div>
+            <nav>
+                <a href="#home">Home</a>
+                <a href="#training">Training</a>
+                <a href="#scanner">Scanner</a>
+                <a href="#stats">Stats</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">🚀 Interactive Cybersecurity Training</div>
+                <h2>Master Scam Detection<br>Through Experience</h2>
+                <p>Train your mind to spot phishing emails, fake texts, and online scams in a safe, gamified environment.</p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number" id="scamsBlocked">0</span>
+                        <span class="stat-label">Scams Blocked</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="userScore">0</span>
+                        <span class="stat-label">Average Score</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="accuracy">0%</span>
+                        <span class="stat-label">Accuracy Rate</span>
+                    </div>
+                </div>
+                <button class="cta-button" onclick="startTraining()">
+                    <span>Begin Training</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Training Section -->
+    <section id="training" class="training-section">
+        <div class="container">
+            <h2>Interactive Detection Training</h2>
+            <p class="section-subtitle">Identify red flags by clicking on suspicious elements. Each correct identification builds your cybersecurity skills.</p>
+            
+            <div class="difficulty-selector">
+                <button class="difficulty-btn active" data-level="beginner"><span>🌱 Beginner</span></button>
+                <button class="difficulty-btn" data-level="intermediate"><span>⚡ Intermediate</span></button>
+                <button class="difficulty-btn" data-level="advanced"><span>🔥 Advanced</span></button>
+            </div>
+
+            <div id="scamContainer" class="scam-container">
+                <!-- Scam scenarios will be loaded here -->
+            </div>
+
+            <div id="feedbackContainer" class="feedback-container hidden">
+                <h3 id="feedbackTitle"></h3>
+                <div id="feedbackContent"></div>
+                <div class="feedback-actions">
+                    <button class="btn-primary" onclick="nextScenario()">Next Challenge →</button>
+                    <button class="btn-secondary" onclick="reviewScenario()">Review Again</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scanner Section -->
+    <section id="scanner" class="scanner-section">
+        <div class="container">
+            <h2>AI-Powered Scam Scanner</h2>
+            <p class="section-subtitle">Paste any suspicious message and our advanced algorithm will analyze it for threats</p>
+            
+            <div class="scanner-box">
+                <textarea id="scanInput" placeholder="Paste your suspicious email, text message, or DM here for instant analysis..."></textarea>
+                <button class="btn-primary" onclick="scanMessage()" style="width: 100%;">🔍 Analyze Message</button>
+            </div>
+
+            <div id="scanResults" class="scan-results hidden">
+                <h3>Analysis Results</h3>
+                <div class="risk-meter">
+                    <div class="risk-label">Threat Level Assessment</div>
+                    <div class="risk-bar">
+                        <div id="riskFill" class="risk-fill"></div>
+                    </div>
+                    <div id="riskText" class="risk-text"></div>
+                </div>
+                <div id="redFlagsList" class="red-flags-list"></div>
+                <div class="scan-tips">
+                    <h4>💡 Security Recommendations</h4>
+                    <ul id="safetyTips"></ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section id="stats" class="stats-section">
+        <div class="container">
+            <h2>Your Progress Dashboard</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <h3>Scenarios Completed</h3>
+                    <p class="stat-value" id="scenariosCompleted">0</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <h3>Correct Identifications</h3>
+                    <p class="stat-value" id="correctIds">0</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <h3>Missed Red Flags</h3>
+                    <p class="stat-value" id="missedFlags">0</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <h3>Skill Improvement</h3>
+                    <p class="stat-value" id="improvement">+0%</p>
+                </div>
+            </div>
+
+            <div class="achievement-section">
+                <h3>🏆 Achievement Collection</h3>
+                <div class="achievements-grid" id="achievementsGrid">
+                    <!-- Achievements will be populated here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p style="font-size: 1.2rem; font-weight: 600; color: var(--text-white);">PhishGuard Live</p>
+            <p>Advanced Cybersecurity Training Platform</p>
+            <p>Built for TechElevate ScamShield Hackathon 2026</p>
+            <p class="disclaimer">⚠️ Educational Tool Only - All scenarios are simulated for training purposes</p>
+        </div>
+    </footer>
+
+    <script>
+        // Global state
+        let currentScenario = null;
+        let currentDifficulty = 'beginner';
+        let userStats = {
+            scamsBlocked: 0,
+            totalScore: 0,
+            scenariosCompleted: 0,
+            correctIdentifications: 0,
+            missedFlags: 0,
+            totalAttempts: 0
+        };
+
+        // Scam scenarios database
+        const scamScenarios = {
+            beginner: [
+                {
+                    type: 'email',
+                    from: 'support@paypa1-secure.com',
+                    subject: 'Urgent: Verify Your Account Now!',
+                    body: 'Dear valued customer, Your PayPal account has been limited due to suspicious activity. Click here immediately to verify your identity or your account will be permanently suspended within 24 hours. Verify Now: http://paypal-verify.tk/secure',
+                    redFlags: [
+                        { text: 'paypa1-secure.com', reason: 'Fake domain - uses number "1" instead of letter "l"', category: 'Suspicious sender' },
+                        { text: 'limited due to suspicious activity', reason: 'Creates false urgency and fear', category: 'Pressure tactics' },
+                        { text: 'Click here immediately', reason: 'Urgent call to action to bypass critical thinking', category: 'Pressure tactics' },
+                        { text: 'paypal-verify.tk', reason: 'Suspicious URL - real PayPal uses paypal.com', category: 'Fake links' },
+                        { text: 'within 24 hours', reason: 'Artificial deadline to pressure quick action', category: 'Pressure tactics' }
+                    ]
+                },
+                {
+                    type: 'email',
+                    from: 'no-reply@amazon-security.net',
+                    subject: 'Your order #8472-2849-1937 has been shipped',
+                    body: 'Hello, Your recent order for iPhone 15 Pro Max ($1,299.99) has been shipped and will arrive tomorrow. If you did not place this order, please cancel immediately by clicking below. Cancel Order: http://amaz0n-cancelorder.com/cancel?id=8472',
+                    redFlags: [
+                        { text: 'amazon-security.net', reason: 'Wrong domain - real Amazon uses amazon.com', category: 'Suspicious sender' },
+                        { text: 'If you did not place this order', reason: 'Creates panic about unauthorized purchase', category: 'Social engineering' },
+                        { text: 'please cancel immediately', reason: 'Urgency to make you click without thinking', category: 'Pressure tactics' },
+                        { text: 'amaz0n-cancelorder.com', reason: 'Fake URL using "0" instead of "o"', category: 'Fake links' }
+                    ]
+                },
+                {
+                    type: 'email',
+                    from: 'prize.notification@gmail.com',
+                    subject: 'CONGRATULATIONS! You have WON $5,000!!!',
+                    body: 'Dear Winner, You have been selected as the lucky recipient of our $5,000 cash prize! To claim your prize, simply provide your bank account details and social security number for verification. Reply to this email within 48 hours or forfeit your winnings!',
+                    redFlags: [
+                        { text: 'prize.notification@gmail.com', reason: 'Generic Gmail address, not an official organization', category: 'Suspicious sender' },
+                        { text: 'You have WON', reason: 'Unsolicited prize - you never entered a contest', category: 'Too good to be true' },
+                        { text: 'bank account details and social security number', reason: 'Requests sensitive financial information', category: 'Information theft' },
+                        { text: 'within 48 hours or forfeit', reason: 'Creates false deadline pressure', category: 'Pressure tactics' }
+                    ]
+                }
+            ],
+            intermediate: [
+                {
+                    type: 'email',
+                    from: 'noreply@microsoft-services.com',
+                    subject: 'Security Alert: Unusual Sign-in Activity',
+                    body: 'We detected an unusual sign-in to your Microsoft account from IP: 185.220.101.45 (Russia). If this was you, you can ignore this email. Otherwise, please reset your password here: https://login.microsoftonline.verification-portal.com We take your security seriously. The Microsoft Security Team',
+                    redFlags: [
+                        { text: 'microsoft-services.com', reason: 'Suspicious domain - real Microsoft uses microsoft.com or live.com', category: 'Suspicious sender' },
+                        { text: 'IP: 185.220.101.45 (Russia)', reason: 'Uses fear of foreign access to create urgency', category: 'Fear tactics' },
+                        { text: 'verification-portal.com', reason: 'Subdomain on wrong base domain - should be microsoft.com', category: 'Fake links' },
+                        { text: 'reset your password here', reason: 'Legitimate services ask you to go to the site directly, not via email link', category: 'Phishing attempt' }
+                    ]
+                },
+                {
+                    type: 'email',
+                    from: 'billing@netflix-renewal.com',
+                    subject: 'Payment Failed - Update Required',
+                    body: 'Hi there, We were unable to process your payment for Netflix Premium. Your subscription will be cancelled unless you update your payment information within 24 hours. Update Payment Method: https://www.netflix.com.billing-update.net/payment Please note this email was sent from an automated system.',
+                    redFlags: [
+                        { text: 'netflix-renewal.com', reason: 'Not the official Netflix domain (netflix.com)', category: 'Suspicious sender' },
+                        { text: 'subscription will be cancelled', reason: 'Threatens service loss to create urgency', category: 'Pressure tactics' },
+                        { text: 'within 24 hours', reason: 'Artificial deadline', category: 'Pressure tactics' },
+                        { text: 'netflix.com.billing-update.net', reason: 'Fake subdomain trick - the actual domain is .net, not netflix.com', category: 'Fake links' }
+                    ]
+                },
+                {
+                    type: 'text',
+                    from: '+1 (855) 555-0147',
+                    subject: 'Text Message',
+                    body: 'USPS: Your package is awaiting delivery. Confirm your address and pay the $2.95 redelivery fee here: usps-redelivery.info/track?id=US9400123456. Package will be returned if not claimed within 48hrs.',
+                    redFlags: [
+                        { text: 'usps-redelivery.info', reason: 'Wrong domain - USPS uses usps.com', category: 'Fake links' },
+                        { text: '$2.95 redelivery fee', reason: 'USPS doesn\'t charge small fees via text message links', category: 'Financial request' },
+                        { text: 'within 48hrs', reason: 'Creates false urgency', category: 'Pressure tactics' },
+                        { text: '+1 (855) 555-0147', reason: 'Generic toll-free number, not from official USPS shortcode', category: 'Suspicious sender' }
+                    ]
+                }
+            ],
+            advanced: [
+                {
+                    type: 'email',
+                    from: 'security@apple.com',
+                    fromDisplay: 'Apple ID <security@apple.com>',
+                    subject: 'Your Apple ID was used to sign in to iCloud on a Windows PC',
+                    body: 'Your Apple ID (john.doe@email.com) was used to sign in to iCloud on a Windows PC. Date and Time: January 29, 2026, 3:42 PM PST. Operating System: Windows 10. If you recently signed in on this device, you can disregard this email. If you did not sign in and believe someone may have accessed your account, please secure your account immediately. Secure My Account: https://appleid.apple.com.manage.id-security.net/verify Best regards, Apple Support',
+                    redFlags: [
+                        { text: 'appleid.apple.com.manage.id-security.net', reason: 'Subdomain deception - real domain is .net, not apple.com', category: 'Sophisticated phishing' },
+                        { text: 'security@apple.com', reason: 'Email address can be spoofed - check the actual domain carefully', category: 'Email spoofing' },
+                        { text: 'believe someone may have accessed your account', reason: 'Plants fear to bypass rational thinking', category: 'Fear tactics' }
+                    ]
+                },
+                {
+                    type: 'email',
+                    from: 'support@linkedin.com',
+                    subject: 'You appeared in 12 searches this week',
+                    body: 'Hi there, You\'re getting noticed! Your profile appeared in 12 searches this week. See who viewed your profile and upgrade to Premium to unlock unlimited insights. View Profile Views: https://www.linkedin.com/premium/upgrade?ref=profile_views Note: This link expires in 3 days. Stay connected, The LinkedIn Team',
+                    redFlags: [
+                        { text: 'This link expires in 3 days', reason: 'Creates false urgency - legitimate LinkedIn emails don\'t have expiring links', category: 'Pressure tactics' },
+                        { text: 'linkedin.com/premium/upgrade', reason: 'While domain looks correct, hover over link to verify actual destination', category: 'Link verification needed' }
+                    ]
+                },
+                {
+                    type: 'email',
+                    from: 'ceo@yourcompany.com',
+                    subject: 'URGENT: Need Gift Cards',
+                    body: 'Hi, I\'m currently in a meeting and need your help urgently. Can you purchase 5 x $100 Google Play gift cards from the nearest store? I need them for client gifts but I\'m tied up all day. Please send me the card codes via email as soon as possible. I\'ll reimburse you tomorrow. Thanks, James Peterson CEO',
+                    redFlags: [
+                        { text: 'ceo@yourcompany.com', reason: 'CEO impersonation - verify sender through another channel', category: 'Business email compromise' },
+                        { text: 'purchase 5 x $100 Google Play gift cards', reason: 'Gift card requests are common scam tactic - CEOs don\'t ask for gift cards via email', category: 'Gift card scam' },
+                        { text: 'I\'m currently in a meeting', reason: 'Creates urgency and explains why you can\'t verify via call', category: 'Social engineering' },
+                        { text: 'send me the card codes via email', reason: 'Legitimate businesses never ask for gift card codes', category: 'Red flag request' },
+                        { text: 'I\'ll reimburse you tomorrow', reason: 'Promise of reimbursement to overcome hesitation', category: 'Social engineering' }
+                    ]
+                }
+            ]
+        };
+
+        // Achievements
+        const achievements = [
+            { id: 'first_scam', name: 'First Catch', icon: '🎯', description: 'Identify your first scam', unlocked: false },
+            { id: 'perfect_score', name: 'Perfect Vision', icon: '👁️', description: 'Get 100% on a scenario', unlocked: false },
+            { id: 'five_completed', name: 'Detective', icon: '🕵️', description: 'Complete 5 scenarios', unlocked: false },
+            { id: 'advanced_master', name: 'Expert', icon: '🏆', description: 'Complete an advanced scenario', unlocked: false },
+            { id: 'quick_learner', name: 'Quick Learner', icon: '⚡', description: 'Score 80%+ on first try', unlocked: false },
+            { id: 'scanner_user', name: 'Vigilant', icon: '🔍', description: 'Use the scanner tool', unlocked: false }
+        ];
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            updateStatsDisplay();
+            renderAchievements();
+            setupDifficultyButtons();
+            loadScenario();
+            
+            // Smooth scrolling for navigation
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            // Header scroll effect
+            window.addEventListener('scroll', function() {
+                const header = document.getElementById('header');
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+        });
+
+        // Toast notification function
+        function showToast(title, message, icon = '🎉') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-icon">${icon}</div>
+                <div class="toast-content">
+                    <h4>${title}</h4>
+                    <p>${message}</p>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            toastContainer.appendChild(toast);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
+
+        // Setup difficulty selector
+        function setupDifficultyButtons() {
+            const buttons = document.querySelectorAll('.difficulty-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentDifficulty = this.dataset.level;
+                    loadScenario();
+                });
+            });
+        }
+
+        // Load a random scenario based on difficulty
+        function loadScenario() {
+            const scenarios = scamScenarios[currentDifficulty];
+            currentScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            
+            const container = document.getElementById('scamContainer');
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            feedbackContainer.classList.add('hidden');
+            
+            if (currentScenario.type === 'email') {
+                container.innerHTML = `
+                    <div class="scam-email">
+                        <div class="email-header">
+                            <div class="email-field">
+                                <strong>From:</strong>
+                                <span class="clickable-text" data-flag="0">${currentScenario.from}</span>
+                            </div>
+                            <div class="email-field">
+                                <strong>Subject:</strong>
+                                <span>${currentScenario.subject}</span>
+                            </div>
+                        </div>
+                        <div class="email-body" id="emailBody">
+                            ${createClickableBody()}
+                        </div>
+                        <button class="submit-button" onclick="submitAnswer()">
+                            <span>🎯 Submit Answer</span>
+                        </button>
+                    </div>
+                `;
+            } else if (currentScenario.type === 'text') {
+                container.innerHTML = `
+                    <div class="scam-email">
+                        <div class="email-header">
+                            <div class="email-field">
+                                <strong>From:</strong>
+                                <span class="clickable-text" data-flag-text="${currentScenario.from}">${currentScenario.from}</span>
+                            </div>
+                            <div class="email-field">
+                                <strong>Type:</strong>
+                                <span>Text Message</span>
+                            </div>
+                        </div>
+                        <div class="email-body" id="emailBody">
+                            ${createClickableBody()}
+                        </div>
+                        <button class="submit-button" onclick="submitAnswer()">
+                            <span>🎯 Submit Answer</span>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            setupClickableElements();
+        }
+
+        // Create clickable body text
+        function createClickableBody() {
+            let body = currentScenario.body;
+            
+            currentScenario.redFlags.forEach((flag, index) => {
+                const regex = new RegExp(`(${escapeRegex(flag.text)})`, 'gi');
+                body = body.replace(regex, `<span class="clickable-text" data-flag="${index}">$1</span>`);
+            });
+            
+            return body;
+        }
+
+        function escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Setup click handlers for red flags
+        function setupClickableElements() {
+            const clickableElements = document.querySelectorAll('.clickable-text');
+            clickableElements.forEach(element => {
+                element.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
+        }
+
+        // Submit answer and show feedback
+        function submitAnswer() {
+            const selectedElements = document.querySelectorAll('.clickable-text.selected');
+            const selectedFlags = Array.from(selectedElements).map(el => parseInt(el.dataset.flag));
+            
+            const totalFlags = currentScenario.redFlags.length;
+            const correctSelections = selectedFlags.filter(flag => !isNaN(flag) && flag < totalFlags).length;
+            
+            // Mark correct and missed flags
+            currentScenario.redFlags.forEach((flag, index) => {
+                const elements = document.querySelectorAll(`.clickable-text[data-flag="${index}"]`);
+                elements.forEach(el => {
+                    if (el.classList.contains('selected')) {
+                        el.classList.add('correct');
+                        el.classList.remove('selected');
+                    } else {
+                        el.classList.add('missed');
+                    }
+                });
+            });
+            
+            // Calculate score
+            const score = Math.max(0, Math.round((correctSelections / totalFlags) * 100));
+            
+            // Update stats
+            userStats.scenariosCompleted++;
+            userStats.totalAttempts++;
+            userStats.correctIdentifications += correctSelections;
+            userStats.missedFlags += (totalFlags - correctSelections);
+            userStats.totalScore += score;
+            userStats.scamsBlocked += (score >= 70 ? 1 : 0);
+            
+            // Check achievements
+            checkAchievements(score);
+            
+            // Save stats
+            saveStats();
+            updateStatsDisplay();
+            
+            // Show feedback
+            showFeedback(score, correctSelections, totalFlags);
+        }
+
+        // Show feedback to user
+        function showFeedback(score, correctSelections, totalFlags) {
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            const feedbackTitle = document.getElementById('feedbackTitle');
+            const feedbackContent = document.getElementById('feedbackContent');
+            
+            let title = '';
+            let emoji = '';
+            
+            if (score >= 90) {
+                title = 'Exceptional! 🌟';
+                emoji = '🌟';
+            } else if (score >= 70) {
+                title = 'Well Done! ✨';
+                emoji = '✅';
+            } else if (score >= 50) {
+                title = 'Good Effort! 💪';
+                emoji = '👍';
+            } else {
+                title = 'Keep Training! 🎯';
+                emoji = '💪';
+            }
+            
+            feedbackTitle.innerHTML = title;
+            
+            let feedbackHTML = `
+                <div class="feedback-score">${score}%</div>
+                <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem; color: var(--text-gray);">
+                    You identified ${correctSelections} out of ${totalFlags} red flags
+                </p>
+                <div class="feedback-details">
+                    <h4 style="margin-bottom: 1.5rem; font-size: 1.3rem; color: var(--text-white);">🚩 Red Flags Analysis</h4>
+            `;
+            
+            currentScenario.redFlags.forEach((flag, index) => {
+                feedbackHTML += `
+                    <div class="feedback-item">
+                        <h4>🚩 ${flag.text}</h4>
+                        <p><strong>Threat:</strong> ${flag.reason}</p>
+                        <p><strong>Category:</strong> ${flag.category}</p>
+                    </div>
+                `;
+            });
+            
+            feedbackHTML += `</div>`;
+            feedbackContent.innerHTML = feedbackHTML;
+            
+            feedbackContainer.classList.remove('hidden');
+            feedbackContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Move to next scenario
+        function nextScenario() {
+            document.getElementById('feedbackContainer').classList.add('hidden');
+            loadScenario();
+            document.getElementById('training').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Review current scenario
+        function reviewScenario() {
+            document.getElementById('feedbackContainer').classList.add('hidden');
+            document.getElementById('scamContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Start training from hero button
+        function startTraining() {
+            document.getElementById('training').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Scan message function
+        function scanMessage() {
+            const input = document.getElementById('scanInput').value.trim();
+            
+            if (!input) {
+                showToast('Error', 'Please paste a message to analyze', '⚠️');
+                return;
+            }
+            
+            // Unlock achievement
+            unlockAchievement('scanner_user');
+            
+            // Analyze the message
+            const analysis = analyzeMessage(input);
+            
+            // Display results
+            displayScanResults(analysis);
+        }
+
+        // Analyze message for red flags
+        function analyzeMessage(message) {
+            const redFlags = [];
+            let riskScore = 0;
+            
+            // Check for suspicious URLs
+            const urlPattern = /(https?:\/\/[^\s]+)/gi;
+            const urls = message.match(urlPattern);
+            if (urls) {
+                urls.forEach(url => {
+                    if (!url.includes('.com') && !url.includes('.org') && !url.includes('.edu') && !url.includes('.gov')) {
+                        redFlags.push({ type: 'Suspicious URL', description: `URL uses uncommon domain: ${url}`, severity: 'high' });
+                        riskScore += 25;
+                    }
+                    if (url.match(/\d/g) && url.match(/\d/g).length > 3) {
+                        redFlags.push({ type: 'Unusual URL', description: `URL contains many numbers: ${url}`, severity: 'medium' });
+                        riskScore += 15;
+                    }
+                });
+            }
+            
+            // Check for urgency words
+            const urgencyWords = ['urgent', 'immediately', 'expire', 'limited time', 'act now', 'suspended', 'verify now', 'click here', 'confirm now'];
+            urgencyWords.forEach(word => {
+                if (message.toLowerCase().includes(word)) {
+                    redFlags.push({ type: 'Urgency Tactics', description: `Uses pressure word: "${word}"`, severity: 'medium' });
+                    riskScore += 10;
+                }
+            });
+            
+            // Check for money requests
+            const moneyPattern = /\$[\d,]+/g;
+            const amounts = message.match(moneyPattern);
+            if (amounts) {
+                redFlags.push({ type: 'Financial Request', description: 'Message mentions money or payment', severity: 'high' });
+                riskScore += 20;
+            }
+            
+            // Check for personal info requests
+            const personalInfoWords = ['social security', 'ssn', 'bank account', 'credit card', 'password', 'pin', 'account number'];
+            personalInfoWords.forEach(word => {
+                if (message.toLowerCase().includes(word)) {
+                    redFlags.push({ type: 'Information Theft', description: `Requests sensitive information: "${word}"`, severity: 'high' });
+                    riskScore += 30;
+                }
+            });
+            
+            // Check for prize/lottery scams
+            const prizeWords = ['congratulations', 'winner', 'won', 'prize', 'lottery', 'claim'];
+            let prizeCount = 0;
+            prizeWords.forEach(word => {
+                if (message.toLowerCase().includes(word)) prizeCount++;
+            });
+            if (prizeCount >= 2) {
+                redFlags.push({ type: 'Too Good to Be True', description: 'Mentions unexpected prizes or winnings', severity: 'high' });
+                riskScore += 25;
+            }
+            
+            // Check for poor grammar (simple check)
+            if (message.includes('!!!') || message.match(/[A-Z]{5,}/)) {
+                redFlags.push({ type: 'Poor Formatting', description: 'Excessive punctuation or ALL CAPS text', severity: 'low' });
+                riskScore += 5;
+            }
+            
+            // Cap risk score at 100
+            riskScore = Math.min(100, riskScore);
+            
+            return {
+                riskScore: riskScore,
+                redFlags: redFlags
+            };
+        }
+
+        // Display scan results
+        function displayScanResults(analysis) {
+            const resultsContainer = document.getElementById('scanResults');
+            const riskFill = document.getElementById('riskFill');
+            const riskText = document.getElementById('riskText');
+            const redFlagsList = document.getElementById('redFlagsList');
+            const safetyTips = document.getElementById('safetyTips');
+            
+            // Show results
+            resultsContainer.classList.remove('hidden');
+            
+            // Update risk meter
+            riskFill.style.width = analysis.riskScore + '%';
+            
+            let riskLevel = 'Low Risk';
+            let riskClass = 'low';
+            
+            if (analysis.riskScore >= 70) {
+                riskLevel = '⚠️ High Risk';
+                riskClass = 'high';
+            } else if (analysis.riskScore >= 40) {
+                riskLevel = '⚡ Medium Risk';
+                riskClass = 'medium';
+            } else {
+                riskLevel = '✅ Low Risk';
+                riskClass = 'low';
+            }
+            
+            riskFill.className = 'risk-fill ' + riskClass;
+            riskFill.innerHTML = `<span style="padding-right: 1rem;">${analysis.riskScore}%</span>`;
+            riskText.textContent = riskLevel;
+            riskText.style.color = riskClass === 'high' ? '#ef4444' : (riskClass === 'medium' ? '#fbbf24' : '#10b981');
+            
+            // Display red flags
+            if (analysis.redFlags.length === 0) {
+                redFlagsList.innerHTML = '<p style="color: #10b981; font-weight: 600; text-align: center; padding: 2rem;">✅ No obvious red flags detected. However, always verify suspicious messages through official channels.</p>';
+            } else {
+                let flagsHTML = '';
+                analysis.redFlags.forEach(flag => {
+                    flagsHTML += `
+                        <div class="flag-item">
+                            <div class="flag-icon">🚩</div>
+                            <div class="flag-content">
+                                <h4>${flag.type}</h4>
+                                <p>${flag.description}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                redFlagsList.innerHTML = flagsHTML;
+            }
+            
+            // Safety tips
+            const tips = [
+                'Never click links in unsolicited emails or texts',
+                'Verify requests by contacting the company directly using official contact info',
+                'Be suspicious of urgent requests for money or personal information',
+                'Check sender email addresses carefully for misspellings',
+                'When in doubt, don\'t click - go directly to the official website'
+            ];
+            
+            safetyTips.innerHTML = tips.map(tip => `<li>${tip}</li>`).join('');
+            
+            // Scroll to results
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Check and unlock achievements
+        function checkAchievements(score) {
+            // First scam
+            if (userStats.scenariosCompleted === 1) {
+                unlockAchievement('first_scam');
+            }
+            
+            // Perfect score
+            if (score === 100) {
+                unlockAchievement('perfect_score');
+            }
+            
+            // Five completed
+            if (userStats.scenariosCompleted === 5) {
+                unlockAchievement('five_completed');
+            }
+            
+            // Advanced master
+            if (currentDifficulty === 'advanced' && score >= 70) {
+                unlockAchievement('advanced_master');
+            }
+            
+            // Quick learner
+            if (score >= 80 && userStats.scenariosCompleted === 1) {
+                unlockAchievement('quick_learner');
+            }
+        }
+
+        // Unlock achievement
+        function unlockAchievement(achievementId) {
+            const achievement = achievements.find(a => a.id === achievementId);
+            if (achievement && !achievement.unlocked) {
+                achievement.unlocked = true;
+                saveStats();
+                renderAchievements();
+                
+                // Show toast notification
+                showToast(
+                    '🏆 Achievement Unlocked!',
+                    `${achievement.name}: ${achievement.description}`,
+                    achievement.icon
+                );
+            }
+        }
+
+        // Render achievements
+        function renderAchievements() {
+            const grid = document.getElementById('achievementsGrid');
+            grid.innerHTML = achievements.map(achievement => `
+                <div class="achievement ${achievement.unlocked ? 'unlocked' : ''}">
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-name">${achievement.name}</div>
+                </div>
+            `).join('');
+        }
+
+        // Save stats to localStorage
+        function saveStats() {
+            localStorage.setItem('phishguard_stats', JSON.stringify(userStats));
+            localStorage.setItem('phishguard_achievements', JSON.stringify(achievements));
+        }
+
+        // Load stats from localStorage
+        function loadStats() {
+            const savedStats = localStorage.getItem('phishguard_stats');
+            const savedAchievements = localStorage.getItem('phishguard_achievements');
+            
+            if (savedStats) {
+                userStats = JSON.parse(savedStats);
+            }
+            
+            if (savedAchievements) {
+                const loaded = JSON.parse(savedAchievements);
+                loaded.forEach((saved, index) => {
+                    if (achievements[index]) {
+                        achievements[index].unlocked = saved.unlocked;
+                    }
+                });
+            }
+        }
+
+        // Update stats display
+        function updateStatsDisplay() {
+            // Hero stats
+            document.getElementById('scamsBlocked').textContent = userStats.scamsBlocked;
+            document.getElementById('userScore').textContent = userStats.scenariosCompleted > 0 
+                ? Math.round(userStats.totalScore / userStats.scenariosCompleted) 
+                : 0;
+            
+            const accuracy = userStats.totalAttempts > 0 
+                ? Math.round((userStats.correctIdentifications / (userStats.correctIdentifications + userStats.missedFlags)) * 100) 
+                : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            
+            // Stats section
+            document.getElementById('scenariosCompleted').textContent = userStats.scenariosCompleted;
+            document.getElementById('correctIds').textContent = userStats.correctIdentifications;
+            document.getElementById('missedFlags').textContent = userStats.missedFlags;
+            
+            const improvement = userStats.scenariosCompleted > 1 
+                ? '+' + Math.round((accuracy / userStats.scenariosCompleted) * 10) 
+                : '+0';
+            document.getElementById('improvement').textContent = improvement + '%';
+        }
+    </script>
+</body>
+</html>
